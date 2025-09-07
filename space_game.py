@@ -66,47 +66,45 @@ def black_hole(flags):
             print(TEXT["BLACK_HOLE_CRUNCHED"])
             flags.add(game_end)
 
+def do_nothing(flags):
+    pass
 
-STARMAP = {
-    "earth": ["centauri", "sirius"],
-    "centauri": ["earth", "orion"],
-    "sirius": ["orion", "earth", "black_hole"],
-    "orion": ["centauri", "sirius"],
-    "black_hole": ["sirius"]
+class Planet:
+
+    def __init__(self, name, destinations, puzzle=do_nothing):
+        self.name = name
+        self.description = TEXT[name.upper() + '_DESCRIPTION']
+        self.destinations = destinations
+        self.puzzle = puzzle
+        
+    def visit(self, flags):
+        """interaction with planets"""
+        print(self.description)
+        self.puzzle(flags)
+        
+
+PLANETS = {p.name: p for p in [
+    Planet("earth", ["centauri", "sirius"], do_nothing),
+    Planet("centauri", ["earth", "orion"], engine_puzzle),
+    Planet("sirius", ["orion", "earth", "black_hole"], stellar_quiz),
+    Planet("orion", ["centauri", "sirius"], hire_copilot),
+    Planet("black_hole", ["sirius"], black_hole)
+    ]
 }
 
-EVENT_MAP = {
-    "centauri": engine_puzzle,
-    "sirius": stellar_quiz,
-    "orion": hire_copilot,
-    "black_hole": black_hole
-}
 
-def visit_planet(planet, flags):
-    """interaction with planets"""
-
-    key = planet.upper() + '_DESCRIPTION'
-    print(TEXT[key])
-    EVENT_MAP.get(planet, lambda x:x)(flags)
-
-
-    return STARMAP[planet]
 
 def travel():
     print(TEXT["OPENING_MESSAGE"])
 
-    planet = "earth"
+    planet = PLANETS["earth"]
     flags = set()
-      
-
 
     while game_end not in flags:
-        
         display_inventory(flags)
-        destinations = visit_planet(planet, flags)
-
+        planet.visit(flags)
         if game_end not in flags:
-            planet = select_planet(destinations)
+            planet = PLANETS[select_planet(planet.destinations)]    
 
     print(TEXT["END_CREDITS"])
 
