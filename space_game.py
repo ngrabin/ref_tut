@@ -87,18 +87,8 @@ def visit_planet(planet, flags):
 
     key = planet.upper() + '_DESCRIPTION'
     print(TEXT[key])
+    EVENT_MAP.get(planet, lambda x:x)(flags)
 
-    if planet == "centauri":
-        EVENT_MAP[planet](flags)
-
-    if planet == "sirius":
-        EVENT_MAP[planet](flags)
-
-    if planet == "orion":
-        EVENT_MAP[planet](flags)
-        
-    if planet == "black_hole":
-        EVENT_MAP[planet](flags)
 
     return STARMAP[planet]
 
